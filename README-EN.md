@@ -7,7 +7,7 @@ Build your python project on remote Docker server from Terminal
   
 ## Base on python package
 - click == 7.1.1
-- docker == 4.1.0
+- docker == 4.1.0(already include in lib)
 
 ## Installation
     sudo pip install pesi

@@ -7,10 +7,10 @@
  
 ## Base on python package
 - click == 7.1.1
-- docker == 4.1.0
+- docker == 4.1.0(已经集成在lib中)
    
 ## 安装
-    pip install pesi
+    sudo pip install pesi
 
 ## 快速上手(example)
 > **注意**: 确保你要远程的Docker服务器或者本地Docker已经打开remote api端口,取决于你在setup.cfg里面的配置(
