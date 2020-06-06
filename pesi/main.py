@@ -10,23 +10,23 @@ def cli():
 
 
 @click.command()
-@click.option('--path', '-p', default=os.getcwd(), help='path of project')
-@click.option('--conn', default=None, help='arguments of docker connection')
-@click.option('--pull', type=bool, default=True, help='arguments of docker build image')
-@click.option('--rm', type=bool, default=True, help='arguments of docker build image')
-@click.option('--nocache', type=bool, default=False, help='arguments of docker build image')
+@click.option('--path', '-p', default=os.getcwd(), help='path of project,default where you type pesi')
+@click.option('--conn', default=None, help='specify other docker remote api,default none,'
+                                           'use setup.cfg.docker_remote_api')
+@click.option('--pull', type=bool, default=True, help='allow pull image,default true')
+@click.option('--rm', type=bool, default=True, help='')
+@click.option('--nocache', type=bool, default=False, help='not use cache,default true')
 def build(path, conn, pull, rm, nocache):
     """
-    1.read setup.cfg
-    2.connect docker remote api
-    3.build docker image on remote docker server
-    :param path:
-    :param conn:
-    :param pull:
-    :param rm:
-    :param nocache:
-    :return:
+    1.read setup.cfg\n
+    2.connect docker rmote api\n
+    3.build docker image on remote docker server\n
     """
+    _init(path=path)
+    _build(path=path, conn=conn, pull=pull, rm=rm, nocache=nocache)
+
+
+def _build(path, conn, pull, rm, nocache):
     click.echo('> ' * 6 + 'build docker image')
     click.echo('> ' * 6 + 'project path: ' + path)
     config = ConfigParser()
@@ -38,10 +38,11 @@ def build(path, conn, pull, rm, nocache):
 
     if not os.path.exists(docker_file_path):
         click.echo('> ' * 6 + 'Dockerfile not found')
-        return
+        raise EOFError
 
     project_name = config.get('metadata', 'name')
     project_version = config.get('metadata', 'version')
+
     docker_remote_api = conn if conn else config.get('docker', 'docker_remote_api')
 
     try:
@@ -66,11 +67,11 @@ def build(path, conn, pull, rm, nocache):
     click.echo('> ' * 6 + 'build docker image done')
 
 
-@click.command()
-@click.option('--path', '-p', default=os.getcwd(), help='path of project dir')
-@click.option('--bdist_wheel', is_flag=True, help='create wheel file')
-@click.option('--down_reqs', is_flag=True, help='download requirements package from requirements.txt')
-def init(path, bdist_wheel, down_reqs):
+# @click.command()
+# @click.option('--path', '-p', default=os.getcwd(), help='path of project dir')
+# @click.option('--bdist_wheel', is_flag=True, help='create wheel file')
+# @click.option('--down_reqs', is_flag=True, help='download requirements package from requirements.txt')
+def _init(path, bdist_wheel=None, down_reqs=None):
     """
     1. init project requirements, cp project to deploy dir
     2. (option) create wheel file
@@ -85,7 +86,7 @@ def init(path, bdist_wheel, down_reqs):
 
     if not os.path.exists(deploy_path):
         click.echo('> ' * 6 + 'deploy dir not found')
-        return
+        raise EOFError
 
     if bdist_wheel:
         click.echo('> ' * 6 + 'creating wheel')
@@ -109,65 +110,7 @@ def init(path, bdist_wheel, down_reqs):
     click.echo('> ' * 6 + 'init project done')
 
 
-@click.command()
-@click.option('--path', '-p', default=os.getcwd(), help='path of project')
-@click.option('--conn', default=None, help='arguments of docker connection')
-@click.option('--pull', type=bool, default=True, help='arguments of docker build image')
-@click.option('--rm', type=bool, default=True, help='arguments of docker build image')
-@click.option('--nocache', type=bool, default=False, help='arguments of docker build image')
-def throw(path, conn, pull, rm, nocache):
-    """
-
-    :param path:
-    :param conn:
-    :param pull:
-    :param rm:
-    :param nocache:
-    :return:
-    """
-    click.echo('> ' * 6 + 'build docker image')
-    click.echo('> ' * 6 + 'project path: ' + path)
-    config = ConfigParser()
-    cfg_path = os.path.join(path, 'setup.cfg')
-    config.read(cfg_path)
-
-    docker_path = path
-    docker_file_path = os.path.join(docker_path, 'Dockerfile')
-
-    if not os.path.exists(docker_file_path):
-        click.echo('> ' * 6 + 'Dockerfile not found')
-        return
-
-    project_name = config.get('metadata', 'name')
-    project_version = config.get('metadata', 'version')
-    docker_remote_api = conn if conn else config.get('docker', 'docker_remote_api')
-
-    tag = '{}:{}'.format(project_name, project_version)
-
-    try:
-        client = docker.DockerClient(docker_remote_api)
-    except Exception as e:
-        print(type(docker_remote_api), docker_remote_api)
-        click.echo('> ' * 6 + 'docker client connection error')
-        click.echo(e)
-        return
-
-    try:
-        res = client.images.build(path=docker_path, pull=pull, rm=rm, nocache=nocache, tag=tag)
-    except Exception as e:
-        print(type(tag), tag)
-        click.echo('> ' * 6 + 'docker build image error')
-        click.echo(e)
-
-        return
-
-    click.echo(res)
-    click.echo('> ' * 6 + 'build docker image done')
-
-
 cli.add_command(build)
-cli.add_command(init)
-cli.add_command(throw)
 
 if __name__ == '__main__':
     cli()

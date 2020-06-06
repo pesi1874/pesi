@@ -10,7 +10,7 @@ from ..errors import BuildError, ImageLoadError, InvalidArgument
 from ..utils import parse_repository_tag
 from ..utils.json_stream import json_stream
 from .resource import Collection, Model
-
+# from ..patch.util import filter_chunk
 
 class Image(Model):
     """
@@ -283,6 +283,7 @@ class ImageCollection(Collection):
         image_id = None
         result_stream, internal_stream = itertools.tee(json_stream(resp))
         for chunk in internal_stream:
+            # print(filter_chunk(chunk))
             print(chunk)
             if 'error' in chunk:
                 raise BuildError(chunk['error'], result_stream)
