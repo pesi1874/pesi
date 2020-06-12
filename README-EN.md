@@ -2,12 +2,14 @@
 Build your python project on remote Docker server from Terminal
 
 ## Environment
-- Ubuntu 18.04.4 LTS / Ubuntu 16.04.6 LTS
-- Python 3.5,3.6
+- Linux
+- Python 3.5 / 3.6
   
 ## Base on python package
 - click == 7.1.1
-- docker == 4.1.0(already include in lib)
+- docker == 4.1.0(已经集成在lib中)
+- requests == 2.23.0
+- websocket == 0.2.1
 
 ## Installation
     sudo pip install pesi
@@ -16,25 +18,31 @@ Build your python project on remote Docker server from Terminal
 > **WARNING**: Make sure you had opened remote api for docker server or local docker server,up to setup.cfg in the 
 example(https://success.docker.com/article/how-do-i-enable-the-remote-api-for-dockerd)
 
+```bash
     git clone https://github.com/pesi1874/pesi.git
     cd psei/example
-    pesi init  <this step will copy test-project to dir depoly with name app>
-    pesi build  <this step will use docker-py api to build docker image on your docker server>
+    pesi build
+```
 
 ## Project Dir Demand
-    |-- project-name/
-        |--deploy/
-            |-- Dockerfile
-            |-- requirements.txt
-            |-- run.sh
-        |--setup.cfg
-        |--project-name/
-            |--main.py
+```bash
+|-- project-name/
+    |--deploy/
+        |-- Dockerfile
+        |-- requirements.txt
+        |-- run.sh
+    |--project-name/
+        |--main.py
+    |--setup.cfg
+```
             
 ## Build project
+```bash
     cd <python project>
-    pesi init
     pesi build
+```
 
 ## Help
+```bash
     pesi --help
+```
