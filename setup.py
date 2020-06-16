@@ -6,7 +6,7 @@ with codecs.open('./README.md', encoding='utf-8') as readme_md:
 
 setup(
     name="pesi",
-    version="0.0.3",
+    version="0.0.4",
     author="pesi1874",
     author_email="pesi1874@gmail.com",
     description="Build your Python project to Docker image on remote Docker server",
